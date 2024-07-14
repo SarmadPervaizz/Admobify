@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <entry>
+        <key>json_1</key>
+        <value>{"splash_ad":true, "language_native_ad":true, "home_ad":true}</value>
+    </entry>
+</defaultsMap>

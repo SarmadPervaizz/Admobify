@@ -1,0 +1,37 @@
+[versions]
+agp = "8.2.2"
+billingKtx = "7.0.0"
+kotlin = "1.9.0"
+coreKtx = "1.13.1"
+appcompat = "1.7.0"
+material = "1.12.0"
+activity = "1.9.0"
+constraintlayout = "2.1.4"
+google-ads-v = "23.2.0"
+lifecycle_v="1.1.1"
+lifecycleProcess = "2.8.3"
+sdpAndroid = "1.1.0"
+sspAndroid = "1.1.0"
+analytics = "22.0.2"
+remoteConfigs = "22.0.0"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+billing-ktx = { module = "com.android.billingclient:billing-ktx", version.ref = "billingKtx" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+google-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "google-ads-v" }
+lifecycle = {group="android.arch.lifecycle",name = "extensions" , version.ref ="lifecycle_v"}
+androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
+sdp-android = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroid" }
+ssp-android = { module = "com.intuit.ssp:ssp-android", version.ref = "sspAndroid" }
+analytics = {group="com.google.firebase",name = "firebase-analytics", version.ref = "analytics"}
+remote_config = {group="com.google.firebase",name = "firebase-config", version.ref = "remoteConfigs"}
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+
