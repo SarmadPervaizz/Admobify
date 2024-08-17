@@ -75,7 +75,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.SarmadPervaizz"
                 artifactId = "admobify"
-                version = "1.2"
+                version = "1.4-beta1"
 
                 // Include sources and javadoc jars
                 artifact(tasks.named("sourcesJar").get())
@@ -86,8 +86,13 @@ afterEvaluate {
 
 val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
-    from(android.sourceSets["main"].java.srcDirs)
-    from(android.sourceSets["main"].kotlin.srcDirs())
+    // Collect source directories as files
+    val javaSources = android.sourceSets["main"].java.srcDirs
+    val kotlinSources = android.sourceSets["main"].kotlin.srcDirs()
+
+    // Include both Java and Kotlin sources
+    from(javaSources)
+    from(kotlinSources)
 }
 
 tasks.named("sourcesJar").configure {
