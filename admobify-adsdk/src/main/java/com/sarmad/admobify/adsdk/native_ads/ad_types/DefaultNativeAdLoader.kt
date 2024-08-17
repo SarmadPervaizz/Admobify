@@ -1,11 +1,13 @@
 package com.sarmad.admobify.adsdk.native_ads.ad_types
 
-import android.content.Context
+import android.app.Application
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.sarmad.admobify.adsdk.native_ads.NativeAdCallback
 import com.sarmad.admobify.adsdk.utils.Logger
 
@@ -21,7 +23,7 @@ internal object DefaultNativeAdLoader {
 
 
     fun loadNativeAd(
-        context: Context,
+        application: Application,
         adId: String,
         adListener: NativeAdCallback
     ) {
@@ -43,7 +45,11 @@ internal object DefaultNativeAdLoader {
 
             loadingNativeAd = true
 
-            val adLoader = AdLoader.Builder(context, adId).forNativeAd { newNativeAd ->
+
+            val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
+            val nativeOptions = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
+
+            val adLoader = AdLoader.Builder(application, adId).withNativeAdOptions(nativeOptions).forNativeAd { newNativeAd ->
 
                 nativeAd = newNativeAd
 

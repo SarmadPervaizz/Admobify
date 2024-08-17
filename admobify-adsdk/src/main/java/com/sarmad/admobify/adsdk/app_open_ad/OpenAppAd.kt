@@ -1,6 +1,7 @@
 package com.sarmad.admobify.adsdk.app_open_ad
 
 import android.app.Activity
+import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Context
 import android.os.Bundle
@@ -33,13 +34,7 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
     private var mContext: Context? = null
 
-    var appOpenAd: AppOpenAd? = null
-
     private var openAdId: String? = null
-
-    private var adRemote:Boolean = false
-
-    var isAdLoadRequested = false
 
     private val appLifeScope = ProcessLifecycleOwner.get().lifecycleScope
 
@@ -51,28 +46,52 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
     private var canReloadOnDismiss = false
 
+    private var mLoadOnPause = false
+
+
+    companion object {
+
+        private var appOpenAd: AppOpenAd? = null
+
+        private var isLoadingOpenAd = false
+
+        internal var adRemote:Boolean = false
+
+        var unregisterLifecycle: (() -> Unit)? = null
+    }
+
     fun init(
-        activity: Activity,
+        application: Application,
         adId: String,
         remote:Boolean,
         preloadAd: Boolean,
-        reloadOnDismiss: Boolean
+        loadOnPause: Boolean,
+        reloadOnDismiss: Boolean=false
     ) {
         this.shouldLoadAdAfterInit = preloadAd
         this.canReloadOnDismiss = reloadOnDismiss
         openAdId = adId
         adRemote = remote
-        mContext = activity.applicationContext
+        mContext = application
+        mLoadOnPause = loadOnPause
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        activity.application.registerActivityLifecycleCallbacks(this)
+        application.registerActivityLifecycleCallbacks(this)
+
+        unregisterLifecycle = {
+            ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+            application.unregisterActivityLifecycleCallbacks(this)
+            appOpenAd = null
+            isLoadingOpenAd = false
+            adRemote = false
+        }
     }
 
 
     private fun loadAppOpenAd() {
 
-        if (isAdLoadRequested || isAdAvailable()) {
+        if (isLoadingOpenAd || isAdAvailable()) {
 
-            Log.e(LOG_TAG, "is Ad Load Requested: $isAdLoadRequested")
+            Log.e(LOG_TAG, "is Ad Load Requested: $isLoadingOpenAd")
 
             Log.e(LOG_TAG, "is Ad Available: ${isAdAvailable()}")
 
@@ -84,7 +103,7 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
         if (adRemote && !premiumUser && networkAvailable){
 
-            isAdLoadRequested = true
+            isLoadingOpenAd = true
 
             Logger.logDebug(LOG_TAG,"loading ad")
 
@@ -104,13 +123,13 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
         val callback = object : AppOpenAd.AppOpenAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 appOpenAd = null
-                isAdLoadRequested = false
+                isLoadingOpenAd = false
 
                 Logger.logDebug(LOG_TAG, "onAdFailedToLoad")
             }
 
             override fun onAdLoaded(ad: AppOpenAd) {
-                isAdLoadRequested = false
+                isLoadingOpenAd = false
                 loadTime = Date().time
                 appOpenAd = ad
 
@@ -191,6 +210,8 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
         if (!shouldLoadAdAfterInit){
             loadAppOpenAd()
             shouldLoadAdAfterInit = true
+        } else if (mLoadOnPause){
+            loadAppOpenAd()
         }
     }
 

@@ -23,57 +23,12 @@ class InterstitialAdsActivity : AppCompatActivity() {
     val adBuilder:InterAdBuilder get() {
         return InterAdOptions().setAdId(getString(R.string.interstitial_ad)).setRemoteConfig(true)
             .setFakeDelayForDialog(2)
-//            .setCustomLoadingLayout(CustomLoadingDialogBinding.inflate(layoutInflater).root)
+            .setCustomLoadingLayout(CustomLoadingDialogBinding.inflate(layoutInflater).root)
             .setFullScreenLoading(true).build(this)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
-
-        InterstitialAdUtils(adBuilder).loadAndShowInterAd(object : InterAdLoadCallback() {
-
-            override fun adAlreadyLoaded() {
-
-            }
-
-            override fun adLoaded() {
-
-            }
-
-            override fun adFailed(error: LoadAdError?, msg: String?) {
-
-            }
-
-            override fun adValidate() {
-
-            }
-        },
-            object : InterAdShowCallback() {
-                override fun adNotAvailable() {
-                    super.adNotAvailable()
-                }
-
-                override fun adShowFullScreen() {
-                    super.adShowFullScreen()
-                }
-
-                override fun adDismiss() {
-                    super.adDismiss()
-                }
-
-                override fun adFailedToShow() {
-                    super.adFailedToShow()
-                }
-
-                override fun adImpression() {
-                    super.adImpression()
-                }
-
-                override fun adClicked() {
-                    super.adClicked()
-                }
-            })
 
         binding.apply {
             btnLoadShow.setOnClickListener {

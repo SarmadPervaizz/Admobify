@@ -2,13 +2,11 @@ package com.sarmad.admobify.adsdk.utils
 
 import android.app.Activity
 import android.app.Dialog
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.TextView
 import com.sarmad.admobify.adsdk.R
 import com.sarmad.admobify.adsdk.app_open_ad.OpenAppAdState
 
@@ -23,13 +21,16 @@ class LoadingDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (customLayout!=null){
-            setContentView(customLayout)
-        } else {
-            setContentView(R.layout.loading_dialog)
+
+        when {
+            customLayout != null -> setContentView(customLayout)
+            fullScreenDialog -> setContentView(R.layout.fullscreen_loading_dialog)
+            else -> setContentView(R.layout.loading_dialog)
         }
 
         window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        setCancelable(false)
 
         if (fullScreenDialog){
             window?.setLayout(
@@ -44,11 +45,11 @@ class LoadingDialog(
         }
 
         setOnShowListener {
-            OpenAppAdState.disableOpenAppAd(LOG_TAG)
+            OpenAppAdState.disable(LOG_TAG)
         }
 
         setOnDismissListener {
-            OpenAppAdState.enableOpenAppAd(LOG_TAG)
+            OpenAppAdState.enable(LOG_TAG)
         }
 
     }

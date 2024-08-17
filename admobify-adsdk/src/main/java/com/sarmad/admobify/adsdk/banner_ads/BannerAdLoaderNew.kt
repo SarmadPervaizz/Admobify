@@ -14,11 +14,10 @@ import com.google.android.gms.ads.LoadAdError
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
 import com.sarmad.admobify.adsdk.utils.Logger
-import java.lang.ref.WeakReference
 
-internal object BannerAdLoader {
+internal object BannerAdLoaderNew {
 
-    private const val TAG = "BannerAdLoader"
+    private const val TAG = "BannerAdLoaderNew"
 
     private var isLoadingBannerAd = false
 
@@ -309,7 +308,7 @@ internal object BannerAdLoader {
                 container?.visibility = View.GONE
                 callback?.onAdFailed(error)
 
-               updateLoadingStatus(bannerAdType)
+                updateLoadingStatus(bannerAdType)
 
             }
 
@@ -327,7 +326,8 @@ internal object BannerAdLoader {
                 container?.addView(adView)
                 callback?.onAdLoaded(adView)
 
-                updateLoadingStatus(bannerAdType)
+
+               updateLoadingStatus(bannerAdType)
 
             }
 
@@ -354,16 +354,23 @@ internal object BannerAdLoader {
         }
     }
 
+
     private fun updateLoadingStatus(bannerAdType: BannerAdType){
         when (bannerAdType) {
-            BannerAdType.DEFAULT_BANNER -> isLoadingBannerAd = false
-            BannerAdType.COLLAPSIBLE_BANNER -> isLoadingCollapsibleBannerAd = false
-            BannerAdType.RECTANGLE_BANNER -> isLoadingRectangleBannerAd = false
-            BannerAdType.INLINE_ADAPTIVE_BANNER -> isLoadingInlineAdaptiveBannerAd = false
+            BannerAdType.DEFAULT_BANNER_NEW_INSTANCE -> {
+                isLoadingBannerAd = false
+            }
+            BannerAdType.COLLAPSIBLE_BANNER_NEW_INSTANCE -> {
+                isLoadingCollapsibleBannerAd = false
+            }
+            BannerAdType.RECTANGLE_BANNER_NEW_INSTANCE -> {
+                isLoadingRectangleBannerAd = false
+            }
+            BannerAdType.INLINE_ADAPTIVE_BANNER_NEW_INSTANCE -> {
+                isLoadingInlineAdaptiveBannerAd = false
+            }
             else -> {}
         }
     }
-
-
 
 }

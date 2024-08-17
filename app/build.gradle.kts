@@ -37,15 +37,6 @@ android {
         }
 
         create("appProd") {
-            manifestPlaceholders["app_id"] = "ca-app-pub-3940256099942544~3347511713"
-
-            resValue("string", "open_app_ad", "ca-app-pub-3940256099942544/9257395921")
-            resValue("string", "banner_ad", "ca-app-pub-3940256099942544/9214589741")
-            resValue("string", "rectangle_banner_ad", "ca-app-pub-3940256099942544/6300978111")
-            resValue("string", "collapsible_banner_ad", "ca-app-pub-3940256099942544/2014213617")
-            resValue("string", "interstitial_ad", "ca-app-pub-3940256099942544/1033173712")
-            resValue("string", "native_ad", "ca-app-pub-3940256099942544/2247696110")
-            resValue("string", "rewarded_ad", "ca-app-pub-3940256099942544/5224354917")
         }
 
     }
@@ -89,10 +80,14 @@ dependencies {
     implementation(libs.material)
     implementation(libs.google.ads)
     implementation(project(":admobify-adsdk"))
+//
+//    implementation("com.github.SarmadPervaizz:Admobify:1.1")
 
     implementation (libs.sdp.android)
     implementation (libs.ssp.android)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    implementation (libs.billing.ktx)
 
 }

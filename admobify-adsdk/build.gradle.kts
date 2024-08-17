@@ -6,6 +6,13 @@ plugins {
 }
 
 android {
+
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+
     namespace = "com.sarmad.admobify.adsdk"
     compileSdk = 34
 
@@ -59,8 +66,8 @@ dependencies {
     implementation(libs.analytics)
     implementation(libs.remote.config)
 
-
 }
+
 
 afterEvaluate {
     publishing {
@@ -69,8 +76,21 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.SarmadPervaizz"
                 artifactId = "admobify"
-                version = "1.1"
+                version = "1.2"
+
+                // Include sources and javadoc jars
+                artifact(tasks.named("sourcesJar").get())
             }
         }
     }
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(android.sourceSets["main"].java.srcDirs)
+    from(android.sourceSets["main"].kotlin.srcDirs())
+}
+
+tasks.named("sourcesJar").configure {
+    dependsOn(tasks.named("compileReleaseKotlin"))
 }

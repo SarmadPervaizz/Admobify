@@ -24,7 +24,7 @@ class NativeAdsActivity : AppCompatActivity() {
         loadExitNativeAd()
 
         NativeAdUtils().loadNativeAd(
-            context = this@NativeAdsActivity,
+            application = application,
             adId = getString(R.string.native_ad),
             adContainer = null,
             model = null,
@@ -50,7 +50,7 @@ class NativeAdsActivity : AppCompatActivity() {
             )
 
             NativeAdUtils().loadNativeAd(
-                context = this@NativeAdsActivity,
+                application = application,
                 adId = getString(R.string.native_ad),
                 adContainer = binding?.introNativeContainer ?: return,
                 model = nativeAdModel,
@@ -76,7 +76,7 @@ class NativeAdsActivity : AppCompatActivity() {
             )
 
             NativeAdUtils().loadNativeAd(
-                this@NativeAdsActivity,
+                application,
                 getString(R.string.native_ad),
                 binding?.nativeContainer ?: return,
                 nativeAdModel, object : NativeAdCallback() {
@@ -101,7 +101,7 @@ class NativeAdsActivity : AppCompatActivity() {
             )
 
             NativeAdUtils().loadNativeAd(
-                this@NativeAdsActivity,
+                application,
                 getString(R.string.native_ad),
                 binding?.exitNativeContainer ?: return,
                 nativeAdModel, object : NativeAdCallback() {

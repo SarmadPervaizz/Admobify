@@ -44,7 +44,7 @@ class BannerAdsActivity : AppCompatActivity() {
             remote = true,
             container = binding.defaultContainer,
             adLoadingOrShimmer = null,
-            adType = BannerAdType.INLINE_ADAPTIVE_BANNER,
+            adType = BannerAdType.DEFAULT_BANNER,
             callback = object : BannerCallback() {
 
             },

@@ -1,6 +1,6 @@
 package com.sarmad.admobify.adsdk.native_ads
 
-import android.content.Context
+import android.app.Application
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.google.android.gms.ads.LoadAdError
@@ -12,7 +12,7 @@ import com.sarmad.admobify.adsdk.native_ads.ad_types.NativeAdType
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils.hide
 
 internal class CustomNativeAd(
-    val context: Context,
+    val application: Application,
     private val adId: String,
     private val adContainer: ViewGroup?
 ) {
@@ -27,7 +27,7 @@ internal class CustomNativeAd(
 
             NativeAdType.DEFAULT_AD -> {
                 DefaultNativeAdLoader.loadNativeAd(
-                    context = context,
+                    application = application,
                     adId = adId,
                     adListener = listenCallback(adListener, model)
                 )
@@ -35,7 +35,7 @@ internal class CustomNativeAd(
 
             NativeAdType.INTRO_SCREEN_AD -> {
                 IntroNativeAdLoader.loadNativeAd(
-                    context = context,
+                    application = application,
                     adId = adId,
                     adListener = listenCallback(adListener, model)
                 )
@@ -43,7 +43,7 @@ internal class CustomNativeAd(
 
             NativeAdType.EXIT_SCREEN_AD -> {
                 ExitNativeAdLoader.loadNativeAd(
-                    context = context,
+                    application = application,
                     adId = adId,
                     adListener = listenCallback(adListener, model)
                 )
@@ -61,15 +61,18 @@ internal class CustomNativeAd(
 
             override fun adLoaded(nativeAd: NativeAd?) {
                 adItemsModel?.let {
-                    populateNativeAd(it, nativeAd ?: return)
 
-                    adContainer?.removeAllViews()
-                    adContainer?.addView(adItemsModel.nativeAdView)
+                    if (nativeAd != null) {
+                        populateNativeAd(it, nativeAd)
+                        adContainer?.removeAllViews()
+                        adContainer?.addView(adItemsModel.nativeAdView)
+                    }
 
                 }
 
                 //both call backs invoked which ever
                 // is listened in project
+
                 adListener.adLoaded(nativeAd)
                 adListener.adLoaded()
             }
@@ -112,7 +115,7 @@ internal class CustomNativeAd(
         nativeAdView.bodyView = tvBody
 
         nativeAdView.callToActionView = ctaButton
-        ctaButton.text = nativeAd.store
+        ctaButton.text = nativeAd.callToAction
 
         val image = nativeAd.icon
 

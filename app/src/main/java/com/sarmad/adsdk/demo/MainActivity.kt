@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.intuit.sdp.BuildConfig
 import com.sarmad.admobify.adsdk.app_open_ad.OpenAppAd
+import com.sarmad.admobify.adsdk.app_open_ad.OpenAppAdState
 import com.sarmad.admobify.adsdk.banner_ads.BannerAdType
 import com.sarmad.admobify.adsdk.banner_ads.BannerAdUtils
 import com.sarmad.admobify.adsdk.banner_ads.BannerCallback
@@ -13,26 +14,44 @@ import com.sarmad.admobify.adsdk.interstitial_ads.InterAdOptions
 import com.sarmad.admobify.adsdk.interstitial_ads.InterstitialAdUtils
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.adsdk.demo.databinding.ActivityMainBinding
+import com.sarmad.adsdk.demo.databinding.ActivityMainNewBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private var binding: ActivityMainBinding? = null
+    private var binding: ActivityMainNewBinding? = null
+
+
+    var disabled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainNewBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
         val adOptions = InterAdOptions().setAdId(getString(R.string.interstitial_ad)).
         setRemoteConfig(true).setFakeDelayForDialog(2).build(this)
 
         OpenAppAd().init(
-            activity = this,
+            application = application,
             adId = getString(R.string.open_app_ad),
             remote = true,
             preloadAd = false,
-            reloadOnDismiss = true
+            loadOnPause = true,
+            reloadOnDismiss = false
         )
+
+
+        binding?.btnPurchase?.setOnClickListener {
+            if (disabled){
+                OpenAppAdState.enable("Main")
+                disabled = false
+                binding?.btnPurchase?.text = "enabled"
+            } else {
+                OpenAppAdState.disable("Main")
+                disabled = true
+                binding?.btnPurchase?.text = "disabled"
+            }
+        }
 
      /*   Admobify.initialize(
             context = this,
