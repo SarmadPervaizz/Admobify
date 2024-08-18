@@ -78,9 +78,9 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.google.ads)
-    implementation(project(":admobify-adsdk"))
+//    implementation(project(":admobify-adsdk"))
 //
-//    implementation("com.github.SarmadPervaizz:Admobify:1.1")
+    implementation("com.github.SarmadPervaizz:Admobify:1.4-beta3")
 
     implementation (libs.sdp.android)
     implementation (libs.ssp.android)
