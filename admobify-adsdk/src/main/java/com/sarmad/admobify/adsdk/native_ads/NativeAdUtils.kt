@@ -7,17 +7,24 @@ import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
 
 class NativeAdUtils {
 
-
     fun loadNativeAd(
         application: Application,
         adId: String,
+        adRemote: Boolean,
         adContainer: ViewGroup?,
         model: NativeAdItemsModel?,
         callback: NativeAdCallback,
         adType: NativeAdType = NativeAdType.DEFAULT_AD
     ) {
+
         AdmobifyUtils.validateAdMobAdUnitId(adId)
-        CustomNativeAd(application, adId, adContainer).loadNativeAd(
+
+        CustomNativeAd(
+            application = application,
+            adId = adId,
+            remote = adRemote,
+            adContainer = adContainer
+        ).loadNativeAd(
             adListener = callback,
             adType = adType,
             model = model

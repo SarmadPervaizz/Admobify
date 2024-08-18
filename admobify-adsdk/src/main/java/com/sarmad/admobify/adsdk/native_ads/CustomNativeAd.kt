@@ -12,8 +12,9 @@ import com.sarmad.admobify.adsdk.native_ads.ad_types.NativeAdType
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils.hide
 
 internal class CustomNativeAd(
-    val application: Application,
+    private val application: Application,
     private val adId: String,
+    private val remote: Boolean,
     private val adContainer: ViewGroup?
 ) {
 
@@ -29,6 +30,7 @@ internal class CustomNativeAd(
                 DefaultNativeAdLoader.loadNativeAd(
                     application = application,
                     adId = adId,
+                    remote = remote,
                     adListener = listenCallback(adListener, model)
                 )
             }
@@ -37,6 +39,7 @@ internal class CustomNativeAd(
                 IntroNativeAdLoader.loadNativeAd(
                     application = application,
                     adId = adId,
+                    remote = remote,
                     adListener = listenCallback(adListener, model)
                 )
             }
@@ -45,6 +48,7 @@ internal class CustomNativeAd(
                 ExitNativeAdLoader.loadNativeAd(
                     application = application,
                     adId = adId,
+                    remote = remote,
                     adListener = listenCallback(adListener, model)
                 )
             }

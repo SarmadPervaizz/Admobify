@@ -1,11 +1,14 @@
 package com.sarmad.adsdk.demo
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.LoadAdError
 import com.sarmad.admobify.adsdk.native_ads.NativeAdCallback
 import com.sarmad.admobify.adsdk.native_ads.NativeAdItemsModel
 import com.sarmad.admobify.adsdk.native_ads.NativeAdUtils
 import com.sarmad.admobify.adsdk.native_ads.ad_types.NativeAdType
+import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.adsdk.demo.databinding.ActivityMainBinding
 import com.sarmad.adsdk.demo.databinding.NativeAdLayoutBinding
 
@@ -18,25 +21,16 @@ class NativeAdsActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
+        Admobify.setPremiumUser(true)
 
-        loadDefaultNativeAd()
-        loadIntroNativeAd()
-        loadExitNativeAd()
-
-        NativeAdUtils().loadNativeAd(
-            application = application,
-            adId = getString(R.string.native_ad),
-            adContainer = null,
-            model = null,
-            callback = object : NativeAdCallback() {
-
-            }, adType = NativeAdType.INTRO_SCREEN_AD
-        )
+        loadDefaultNativeAd(true)
+        loadIntroNativeAd(true)
+        loadExitNativeAd(true)
 
     }
 
 
-    private fun loadIntroNativeAd() {
+    private fun loadIntroNativeAd(remote:Boolean) {
         val bind = NativeAdLayoutBinding.inflate(layoutInflater)
         bind.apply {
 
@@ -52,17 +46,20 @@ class NativeAdsActivity : AppCompatActivity() {
             NativeAdUtils().loadNativeAd(
                 application = application,
                 adId = getString(R.string.native_ad),
+                adRemote = remote,
                 adContainer = binding?.introNativeContainer ?: return,
                 model = nativeAdModel,
                 callback = object : NativeAdCallback() {
-
+                    override fun adValidate() {
+                        binding?.introNativeContainer?.visibility = View.INVISIBLE
+                    }
                 }, adType = NativeAdType.INTRO_SCREEN_AD
             )
         }
 
     }
 
-    private fun loadDefaultNativeAd() {
+    private fun loadDefaultNativeAd(remote:Boolean) {
         val bind = NativeAdLayoutBinding.inflate(layoutInflater)
         bind.apply {
 
@@ -78,8 +75,14 @@ class NativeAdsActivity : AppCompatActivity() {
             NativeAdUtils().loadNativeAd(
                 application,
                 getString(R.string.native_ad),
+                adRemote = remote,
                 binding?.nativeContainer ?: return,
                 nativeAdModel, object : NativeAdCallback() {
+
+                    override fun adValidate() {
+                        binding?.nativeContainer?.visibility = View.INVISIBLE
+                    }
+
 
                 }, NativeAdType.DEFAULT_AD
             )
@@ -87,7 +90,7 @@ class NativeAdsActivity : AppCompatActivity() {
 
     }
 
-    private fun loadExitNativeAd() {
+    private fun loadExitNativeAd(remote:Boolean) {
         val bind = NativeAdLayoutBinding.inflate(layoutInflater)
         bind.apply {
 
@@ -103,10 +106,15 @@ class NativeAdsActivity : AppCompatActivity() {
             NativeAdUtils().loadNativeAd(
                 application,
                 getString(R.string.native_ad),
+                adRemote = remote,
                 binding?.exitNativeContainer ?: return,
                 nativeAdModel, object : NativeAdCallback() {
 
-                }, NativeAdType.EXIT_SCREEN_AD
+                    override fun adValidate() {
+                        binding?.exitNativeContainer?.visibility = View.INVISIBLE
+                    }
+
+                }, NativeAdType.DEFAULT_AD
             )
         }
 

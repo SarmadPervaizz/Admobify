@@ -9,6 +9,8 @@ import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.sarmad.admobify.adsdk.native_ads.NativeAdCallback
+import com.sarmad.admobify.adsdk.utils.Admobify
+import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
 import com.sarmad.admobify.adsdk.utils.Logger
 
 internal object IntroNativeAdLoader {
@@ -25,38 +27,55 @@ internal object IntroNativeAdLoader {
     fun loadNativeAd(
         application: Application,
         adId: String,
+        remote: Boolean,
         adListener: NativeAdCallback
     ) {
 
-        nativeAdCallback = adListener
+        val network = AdmobifyUtils.isNetworkAvailable(application)
 
-        if (nativeAd != null) {
+        if (remote && network && !Admobify.isPremiumUser()) {
 
-            nativeAdCallback?.adLoaded(nativeAd)
+            nativeAdCallback = adListener
 
-            Logger.logDebug(TAG, "loadNativeAd:adAlreadyPreCached intro ad")
+            if (nativeAd != null) {
+
+                nativeAdCallback?.adLoaded(nativeAd)
+
+                Logger.logDebug(TAG, "loadNativeAd:adAlreadyPreCached intro ad")
+
+            } else {
+
+                if (loadingNativeAd) {
+                    Logger.logDebug(TAG, "loadNativeAd:Already loading intro ad")
+                    return
+                }
+
+                loadingNativeAd = true
+
+                val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
+                val nativeOptions = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
+
+                val adLoader =
+                    AdLoader.Builder(application, adId).withNativeAdOptions(nativeOptions)
+                        .forNativeAd { newNativeAd ->
+
+                            nativeAd = newNativeAd
+
+                        }.withAdListener(attachAdListener()).build()
+
+                adLoader.loadAd(AdRequest.Builder().build())
+
+            }
 
         } else {
 
-            if (loadingNativeAd) {
-                Logger.logDebug(TAG, "loadNativeAd:Already loading intro ad")
-                return
-            }
+            Logger.logDebug(TAG,
+                "adValidate: remote:$remote network:$network" +
+                        " premium user:${Admobify.isPremiumUser()}"
+            )
 
-            loadingNativeAd = true
-
-            val videoOptions = VideoOptions.Builder().setStartMuted(true).build()
-            val nativeOptions = NativeAdOptions.Builder().setVideoOptions(videoOptions).build()
-
-            val adLoader = AdLoader.Builder(application, adId).withNativeAdOptions(nativeOptions).forNativeAd { newNativeAd ->
-
-               nativeAd = newNativeAd
-
-            }.withAdListener(attachAdListener()).build()
-
-            adLoader.loadAd(AdRequest.Builder().build())
+            adListener.adValidate()
         }
-
     }
 
     private fun attachAdListener(): AdListener {
