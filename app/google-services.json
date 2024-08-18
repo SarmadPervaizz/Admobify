@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "271312320478",
+    "project_id": "my-demo-project-f78fd",
+    "storage_bucket": "my-demo-project-f78fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271312320478:android:dcfa3a67f221259f6ccf4f",
+        "android_client_info": {
+          "package_name": "com.sarmad.adsdk.demo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271312320478-li2g0jog2b8jkjhl7pgtckeu6p3pn6j7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZP9468kL8mssEHFYnS910dydiF2t23Ts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271312320478-li2g0jog2b8jkjhl7pgtckeu6p3pn6j7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271312320478:android:8d6cc792bb0d18e26ccf4f",
+        "android_client_info": {
+          "package_name": "com.smartphotoeditor.backgroundremover.photoeditor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271312320478-li2g0jog2b8jkjhl7pgtckeu6p3pn6j7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZP9468kL8mssEHFYnS910dydiF2t23Ts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271312320478-li2g0jog2b8jkjhl7pgtckeu6p3pn6j7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

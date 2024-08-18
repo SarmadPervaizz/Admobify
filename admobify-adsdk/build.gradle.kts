@@ -6,11 +6,11 @@ plugins {
 
 android {
 
-    publishing {
+  /*  publishing {
         singleVariant("release") {
             withSourcesJar()
         }
-    }
+    }*/
 
     namespace = "com.sarmad.admobify.adsdk"
     compileSdk = 34
@@ -54,7 +54,6 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-//    implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.google.ads)
     implementation(libs.lifecycle)
@@ -75,26 +74,21 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.SarmadPervaizz"
                 artifactId = "admobify"
-                version = "1.4-beta1"
-
-                // Include sources and javadoc jars
-                artifact(tasks.named("sourcesJar").get())
+                version = "1.4-beta3"
             }
         }
     }
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
+/*val sourcesJar by tasks.registering(Jar::class) {
     archiveClassifier.set("sources")
-    // Collect source directories as files
-    val javaSources = android.sourceSets["main"].java.srcDirs
-    val kotlinSources = android.sourceSets["main"].kotlin.srcDirs()
 
-    // Include both Java and Kotlin sources
-    from(javaSources)
-    from(kotlinSources)
+
+    from(files(android.sourceSets["main"].java.srcDirs))
+    from(files(android.sourceSets["main"].kotlin.srcDirs()))
+
 }
 
 tasks.named("sourcesJar").configure {
     dependsOn(tasks.named("compileReleaseKotlin"))
-}
+}*/

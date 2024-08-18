@@ -24,7 +24,6 @@ android {
     productFlavors {
 
         create("appDev") {
-            manifestPlaceholders["app_id"] = "ca-app-pub-3940256099942544~3347511713"
 
             resValue("string", "open_app_ad", "ca-app-pub-3940256099942544/9257395921")
             resValue("string", "banner_ad", "ca-app-pub-3940256099942544/9214589741")
