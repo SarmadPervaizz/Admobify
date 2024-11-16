@@ -25,6 +25,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
@@ -66,6 +67,7 @@ dependencies {
 
 }
 
+//TODO hide views in validate case banner native
 
 afterEvaluate {
     publishing {

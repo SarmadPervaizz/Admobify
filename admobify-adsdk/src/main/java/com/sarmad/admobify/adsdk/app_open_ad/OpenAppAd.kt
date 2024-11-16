@@ -5,7 +5,6 @@ import android.app.Application
 import android.app.Application.ActivityLifecycleCallbacks
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -17,16 +16,16 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
-import com.sarmad.admobify.adsdk.utils.Logger
 import com.sarmad.admobify.adsdk.utils.isShowingInterAd
 import com.sarmad.admobify.adsdk.utils.isShowingOpenAd
 import com.sarmad.admobify.adsdk.utils.isShowingRewardAd
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 import com.sarmad.admobify.adsdk.utils.setShowingOpenAd
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
-
-private const val LOG_TAG = "OpenAppAd"
 
 class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
@@ -38,24 +37,24 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
     private val appLifeScope = ProcessLifecycleOwner.get().lifecycleScope
 
-    /** Keep track of the time an app open ad is
-     *  loaded to ensure you don't show an expired ad. */
-    var loadTime = 0L
-
     private var shouldLoadAdAfterInit = false
 
     private var canReloadOnDismiss = false
 
     private var mLoadOnPause = false
 
+    private var adRemote:Boolean = false
 
     companion object {
 
         private var appOpenAd: AppOpenAd? = null
 
-        private var isLoadingOpenAd = false
+        /** Keep track of the time an app open ad is
+         *  loaded to ensure you don't show an expired ad. */
 
-        internal var adRemote:Boolean = false
+        private var openAdloadTime = 0L
+
+        private var isLoadingOpenAd = false
 
         var unregisterLifecycle: (() -> Unit)? = null
     }
@@ -82,7 +81,7 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
             application.unregisterActivityLifecycleCallbacks(this)
             appOpenAd = null
             isLoadingOpenAd = false
-            adRemote = false
+            openAdloadTime = 0L
         }
     }
 
@@ -91,9 +90,22 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
         if (isLoadingOpenAd || isAdAvailable()) {
 
-            Log.e(LOG_TAG, "is Ad Load Requested: $isLoadingOpenAd")
+            when {
 
-            Log.e(LOG_TAG, "is Ad Available: ${isAdAvailable()}")
+                isLoadingOpenAd -> {
+                    Logger.log(Level.DEBUG, Category.OpenAd,
+                        "already loading an ad"
+                    )
+                }
+
+                isAdAvailable() -> {
+                    Logger.log(
+                        Level.DEBUG,
+                        Category.OpenAd,
+                        "ad is already loaded"
+                    )
+                }
+            }
 
             return
         }
@@ -105,7 +117,7 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
             isLoadingOpenAd = true
 
-            Logger.logDebug(LOG_TAG,"loading ad")
+            Logger.log(Level.DEBUG,Category.OpenAd,"requesting ad $openAdId")
 
             AppOpenAd.load(
                 mContext ?: return, openAdId ?: return,
@@ -113,7 +125,8 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
             )
 
         } else {
-            Logger.logError(LOG_TAG,"ad validate -> remote:$adRemote" +
+
+            Logger.log(Level.DEBUG,Category.OpenAd,"ad validate -> remote:$adRemote" +
                     " premiumUser:$premiumUser networkAvailable:$networkAvailable")
         }
     }
@@ -121,19 +134,24 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
     private fun attachLoadCallback(): AppOpenAd.AppOpenAdLoadCallback {
         val callback = object : AppOpenAd.AppOpenAdLoadCallback() {
-            override fun onAdFailedToLoad(p0: LoadAdError) {
+            override fun onAdFailedToLoad(error: LoadAdError) {
                 appOpenAd = null
                 isLoadingOpenAd = false
 
-                Logger.logDebug(LOG_TAG, "onAdFailedToLoad")
+                Logger.log(
+                    Level.ERROR,
+                    Category.OpenAd,
+                    "ad failed to load error code:${error.code} error msg:${error.message}"
+                )
+
             }
 
             override fun onAdLoaded(ad: AppOpenAd) {
                 isLoadingOpenAd = false
-                loadTime = Date().time
+                openAdloadTime = Date().time
                 appOpenAd = ad
 
-                Logger.logDebug(LOG_TAG, "onAdLoaded")
+                Logger.log(Level.DEBUG,Category.OpenAd, "ad loaded")
 
             }
         }
@@ -150,17 +168,17 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
                 setShowingOpenAd(false)
 
-                Logger.logDebug(LOG_TAG, "onAdDismissedFullScreenContent")
+                Logger.log(Level.DEBUG,Category.OpenAd, "ad dismiss")
 
                 if (canReloadOnDismiss){
-                    Logger.logDebug(LOG_TAG, "Reloading Open Ad")
+                    Logger.log(Level.DEBUG,Category.OpenAd, "Reloading Open Ad")
                     loadAppOpenAd()
                 }
             }
 
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
 
-                Logger.logDebug(LOG_TAG, "onAdFailedToShowFullScreenContent:${error.message}")
+                Logger.log(Level.ERROR,Category.OpenAd, "failed to show error code:${error.code} error msg:${error.message}")
 
                 setShowingOpenAd(false)
 
@@ -168,11 +186,13 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
             override fun onAdShowedFullScreenContent() {
 
-                Logger.logDebug(LOG_TAG, "onAdShowedFullScreenContent")
+                Logger.log(Level.DEBUG,Category.OpenAd, "ad show full screen")
 
                 setShowingOpenAd(true)
 
             }
+
+
         }
         appLifeScope.launch {
             delay(200)
@@ -182,7 +202,7 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
 
     private fun isAdAvailable(): Boolean {
-        return appOpenAd != null && AdmobifyUtils.wasLoadTimeLessThanNHoursAgo(4, loadTime)
+        return appOpenAd != null && AdmobifyUtils.wasLoadTimeLessThanNHoursAgo(4, openAdloadTime)
     }
 
 
@@ -194,10 +214,8 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
 
     override fun onStart(owner: LifecycleOwner) {
         if (isAdAvailable() && canShowOpenAd()) {
-            Logger.logDebug(LOG_TAG, "showAppOpenAd -> called")
             showAppOpenAd()
         } else if (shouldLoadAdAfterInit) {
-            Logger.logDebug(LOG_TAG, "loadAppOpenAd -> called")
             loadAppOpenAd()
         }
     }
@@ -206,7 +224,7 @@ class OpenAppAd : DefaultLifecycleObserver, ActivityLifecycleCallbacks {
      * and when he will came back ad will be shown */
 
     override fun onStop(owner: LifecycleOwner) {
-        Logger.logDebug(LOG_TAG, "onStop")
+        Logger.log(Level.DEBUG,Category.OpenAd, "onStop")
         if (!shouldLoadAdAfterInit){
             loadAppOpenAd()
             shouldLoadAdAfterInit = true

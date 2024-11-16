@@ -6,7 +6,8 @@ class HowToUseInterstitialAd {
     //Ads ID and Remote params required others are optional
 
     *   val adOptions = InterAdOptions().setAdId(getString(R.string.interstitial_ad)).
-        setRemoteConfig(true).setFakeDelayForDialog(2).build(this)
+        setRemoteConfig(true).setCustomLoadingLayout(CustomLoadingDialogBinding.inflate(layoutInflater).root)
+        .setFullScreenLoading(true).setFakeDelayForDialog(2).build(this)
 
     * Load Interstitial Ad callbacks are optional
 
@@ -60,46 +61,27 @@ class HowToUseInterstitialAd {
 
     *    InterstitialAdUtils(adOptions).loadAndShowInterAd(object : InterAdLoadCallback() {
 
-            override fun adAlreadyLoaded() {
+            override fun adAlreadyLoaded() {}
 
-            }
+            override fun adLoaded() {}
 
-            override fun adLoaded() {
+            override fun adFailed(error: LoadAdError?, msg: String?) {}
 
-            }
+            override fun adValidate() {}
 
-            override fun adFailed(error: LoadAdError?, msg: String?) {
-
-            }
-
-            override fun adValidate() {
-
-            }
         },
             object : InterAdShowCallback() {
-                override fun adNotAvailable() {
-                    super.adNotAvailable()
-                }
+                override fun adNotAvailable() {}
 
-                override fun adShowFullScreen() {
-                    super.adShowFullScreen()
-                }
+                override fun adShowFullScreen() {}
 
-                override fun adDismiss() {
-                    super.adDismiss()
-                }
+                override fun adDismiss() {}
 
-                override fun adFailedToShow() {
-                    super.adFailedToShow()
-                }
+                override fun adFailedToShow() {}
 
-                override fun adImpression() {
-                    super.adImpression()
-                }
+                override fun adImpression() {}
 
-                override fun adClicked() {
-                    super.adClicked()
-                }
+                override fun adClicked() {}
             })
 
     */

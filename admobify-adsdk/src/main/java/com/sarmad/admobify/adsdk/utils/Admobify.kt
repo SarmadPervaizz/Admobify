@@ -2,57 +2,59 @@ package com.sarmad.admobify.adsdk.utils
 
 import android.content.Context
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.FirebaseApp
-import com.google.android.gms.ads.RequestConfiguration;
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class Admobify {
-
-    companion object {
-
-
-        /** Throw exceptions during ad validation or Invalid ad ids */
-        private var canThrowExceptions = false
-
-        internal fun canThrowException() = canThrowExceptions
+object Admobify {
 
 
-        /** Helpful for Ad validation and Logging errors
-         * to check whether project is in debug or prod mode */
-        internal var mBuildFlavor = "appDev"
+    /** Throw exceptions during ad validation or Invalid ad ids */
+    private var canThrowExceptions = false
 
-        internal var mBuildVariant = "debug"
-
+    internal fun canThrowException() = canThrowExceptions
 
 
-        /** To Avoid Showing Ads if User Purchased App */
+    /** To stop Showing Ads if User Purchased App */
 
-        private var premiumUser = false
+    private var premiumUser = false
 
-        fun isPremiumUser() = premiumUser
+    fun isPremiumUser() = premiumUser
 
-        fun setPremiumUser(value:Boolean){
-            premiumUser = value
+    fun setPremiumUser(value: Boolean) {
+        premiumUser = value
+    }
+
+
+    /** Initialize Ads Sdk */
+    fun initialize(
+        context: Context,
+        testDevicesList: ArrayList<String>,
+        premiumUser: Boolean,
+        canThrowException: Boolean = false
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+
+            try {
+
+                FirebaseApp.initializeApp(context.applicationContext)
+
+                canThrowExceptions = canThrowException
+
+                setPremiumUser(premiumUser)
+
+                MobileAds.initialize(context.applicationContext)
+
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder().setTestDeviceIds(testDevicesList).build()
+                )
+
+            } catch (ignored: Exception) { }
+
         }
 
-
-        /** Initialize Ads Sdk */
-        fun initialize(
-            context: Context,
-            testDevicesList:ArrayList<String>,
-            premiumUser:Boolean,
-            buildFlavor: String,
-            buildVariant: String,
-            canThrowException: Boolean = false
-        ) {
-            FirebaseApp.initializeApp(context.applicationContext)
-            canThrowExceptions = canThrowException
-            mBuildFlavor = buildFlavor
-            mBuildVariant = buildVariant
-            setPremiumUser(premiumUser)
-            MobileAds.initialize(context.applicationContext)
-//            val reqConfig = RequestConfiguration().toBuilder().setTestDeviceIds(testDevicesList).build()
-            MobileAds.setRequestConfiguration(RequestConfiguration.Builder().setTestDeviceIds(testDevicesList).build())
-        }
 
     }
 

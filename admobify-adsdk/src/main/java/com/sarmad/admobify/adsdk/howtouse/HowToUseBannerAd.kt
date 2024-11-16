@@ -47,7 +47,7 @@ class HowToUseBannerAd {
      *             remote = true,
      *             container = binding.container,
      *             adLoadingOrShimmer = null,
-     *             adType = BannerAdType.COLLAPSIBLE_BANNER,
+     *             adType = BannerAdType.INLINE_ADAPTIVE_BANNER,
      *             callback = object : BannerCallback() {
      *              //override required callbacks
      *             },adaptiveBannerHeight = 200)

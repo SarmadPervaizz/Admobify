@@ -13,7 +13,9 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 
 internal object BannerAdLoaderNew {
 
@@ -40,7 +42,7 @@ internal object BannerAdLoaderNew {
         if (AdmobifyUtils.isNetworkAvailable(context) && remote && !Admobify.isPremiumUser()) {
 
             if (isLoadingBannerAd) {
-                Logger.logError(TAG, "Already loading an banner ad")
+                Logger.log(Level.DEBUG, Category.Banner, "Already loading an banner ad")
                 return
             }
 
@@ -55,8 +57,7 @@ internal object BannerAdLoaderNew {
                     val height = container.height
 
                     if (width < 320 || height < 50) {
-                        Logger.logError(
-                            TAG,
+                        Logger.log(Level.ERROR,Category.Banner,
                             "width: ${width} or height: ${height} is invalid for default banner ad"
                         )
                         callback.onAdFailed(null)
@@ -70,7 +71,7 @@ internal object BannerAdLoaderNew {
                     val adSize = AdmobifyUtils.getAdSize(context, container)
 
                     if (adSize == null) {
-                        Logger.logError(TAG, "banner ad size should not be null")
+                        Logger.log(Level.ERROR,Category.Banner, "banner ad size should not be null")
                         callback.onAdFailed(null)
                         return
                     }
@@ -109,7 +110,7 @@ internal object BannerAdLoaderNew {
     ) {
 
         if (isLoadingCollapsibleBannerAd) {
-            Logger.logError(TAG, "Already loading an collapsible banner ad")
+            Logger.log(Level.DEBUG,Category.Banner, "Already loading an collapsible banner ad")
             return
         }
 
@@ -128,8 +129,7 @@ internal object BannerAdLoaderNew {
                     val height = container.height ?: 0
 
                     if (width < 320 || height < 50) {
-                        Logger.logError(
-                            TAG,
+                        Logger.log(Level.ERROR,Category.Banner,
                             "width: ${width} or height: ${height} is invalid for collapsible banner ad"
                         )
                         callback.onAdFailed(null)
@@ -143,7 +143,7 @@ internal object BannerAdLoaderNew {
                     val adSize = AdmobifyUtils.getAdSize(context, container)
 
                     if (adSize == null) {
-                        Logger.logError(TAG, "banner ad size should not be null")
+                        Logger.log(Level.DEBUG,Category.Banner, "banner ad size should not be null")
                         callback.onAdFailed(null)
                         return
                     }
@@ -189,7 +189,7 @@ internal object BannerAdLoaderNew {
         if (AdmobifyUtils.isNetworkAvailable(context) && remote && !Admobify.isPremiumUser()) {
 
             if (isLoadingRectangleBannerAd) {
-                Logger.logError(TAG, "Already loading an rectangle banner ad")
+                Logger.log(Level.DEBUG,Category.Banner, "Already loading an rectangle banner ad")
                 return
             }
 
@@ -206,8 +206,7 @@ internal object BannerAdLoaderNew {
                     val height = container.height ?: 0
 
                     if (width < 300 || height < 250) {
-                        Logger.logError(
-                            TAG,
+                        Logger.log(Level.ERROR,Category.Banner,
                             "width: $width or height: $height is invalid for rectangle banner ad"
                         )
                         callback?.onAdFailed(null)
@@ -253,7 +252,7 @@ internal object BannerAdLoaderNew {
     ) {
 
         if (isLoadingInlineAdaptiveBannerAd) {
-            Logger.logError(TAG, "Already loading an inline adaptive banner ad")
+            Logger.log(Level.DEBUG,Category.Banner, "Already loading an inline adaptive banner ad")
             return
         }
 
@@ -266,7 +265,7 @@ internal object BannerAdLoaderNew {
             val adSize = AdmobifyUtils.getAdaptiveAdSize(context, container, adaptiveBannerHeight)
 
             if (adSize == null) {
-                Logger.logError(TAG, "banner ad size should not be null")
+                Logger.log(Level.ERROR,Category.Banner, "banner ad size should not be null")
                 callback.onAdFailed(null)
                 return
             }
@@ -302,7 +301,7 @@ internal object BannerAdLoaderNew {
         adView.adListener = object : AdListener() {
             override fun onAdFailedToLoad(error: LoadAdError) {
 
-                Logger.logError(TAG, "onAdFailedToLoad:${error.message} -> ${bannerAdType.name}")
+                Logger.log(Level.ERROR,Category.Banner, "${bannerAdType.name} ad failed to load error code:${error.code} error msg:${error.message}")
 
                 loadingOrShimmer?.visibility = View.GONE
                 container?.visibility = View.GONE
@@ -313,13 +312,13 @@ internal object BannerAdLoaderNew {
             }
 
             override fun onAdImpression() {
-                Logger.logDebug(TAG, "onAdImpression -> ${bannerAdType.name}")
+                Logger.log(Level.DEBUG,Category.Banner, "${bannerAdType.name} ad impression")
 
                 callback?.onAdImpression()
             }
 
             override fun onAdLoaded() {
-                Logger.logDebug(TAG, "onAdLoaded -> ${bannerAdType.name}")
+                Logger.log(Level.DEBUG,Category.Banner, "${bannerAdType.name} ad loaded")
 
                 loadingOrShimmer?.visibility = View.GONE
                 container?.removeAllViews()
@@ -332,22 +331,26 @@ internal object BannerAdLoaderNew {
             }
 
             override fun onAdClicked() {
-                Logger.logDebug(TAG, "onAdClicked")
+                Logger.log(Level.DEBUG,Category.Banner, "${bannerAdType.name} ad clicked")
+
                 callback?.onAdClick()
             }
 
             override fun onAdClosed() {
-                Logger.logDebug(TAG, "onAdClosed")
+                Logger.log(Level.DEBUG,Category.Banner, "${bannerAdType.name} ad closed")
+
                 callback?.onAdClose()
             }
 
             override fun onAdOpened() {
-                Logger.logDebug(TAG, "onAdOpened")
+                Logger.log(Level.DEBUG,Category.Banner, "${bannerAdType.name} ad opened")
+
                 callback?.onAdOpen()
             }
 
             override fun onAdSwipeGestureClicked() {
-                Logger.logDebug(TAG, "onAdSwipeGestureClicked")
+                Logger.log(Level.DEBUG,Category.Banner, "${bannerAdType.name} ad swipe gesture")
+
                 callback?.onAdSwipeGestureClicked()
             }
 

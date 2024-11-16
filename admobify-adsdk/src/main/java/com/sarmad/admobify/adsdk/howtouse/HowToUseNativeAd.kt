@@ -27,6 +27,7 @@ class HowToUseNativeAd {
      *             NativeAdUtils().loadNativeAd(
      *                 context = this@NativeAdsActivity,
      *                 adId = getString(R.string.native_ad),
+     *                 adRemote = remote,
      *                 adContainer = binding?.introNativeContainer ?: return,
      *                 model =nativeAdModel,
      *                 callback = object : NativeAdCallback() {

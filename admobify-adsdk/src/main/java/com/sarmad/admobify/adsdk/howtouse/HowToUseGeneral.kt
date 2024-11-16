@@ -6,9 +6,7 @@ class HowToUseGeneral {
      *           Admobify.initialize(
      *             context = this,
      *             testDevicesList = arrayListOf(""),
-     *             premiumUser = false,
-     *             buildFlavor = BuildConfig.BUILD_FLAVOR,
-     *             buildVariant = BuildConfig.BUILD_VARIANT
+     *             premiumUser = false
      *         )
      */
 

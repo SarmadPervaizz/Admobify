@@ -18,7 +18,9 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.Purchase.PurchaseState
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryPurchasesParams
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -71,17 +73,16 @@ class BillingUtils private constructor(private val builder: Builder) {
                                 }
                             }
 
-                            Logger.logError(LOG_TAG, "purchase or subscription done")
+                            Logger.log(Level.DEBUG,Category.Billing, "purchase or subscription done")
 
                             handler.post {
                                 billingListener?.purchasedORSubDone(purchases)
                             }
 
                         } else if (billingResult.responseCode == BillingResponseCode.USER_CANCELED) {
-                            Logger.logError(LOG_TAG, "purchase cancelled by user")
+                            Logger.log(Level.DEBUG,Category.Billing, "purchase cancelled by user")
                         } else {
-                            Logger.logError(
-                                LOG_TAG, "unknown response code:${billingResult.responseCode}" +
+                            Logger.log(Level.ERROR,Category.Billing, "unknown response code:${billingResult.responseCode}" +
                                         "msg:${billingResult.debugMessage}"
                             )
                         }
@@ -90,7 +91,7 @@ class BillingUtils private constructor(private val builder: Builder) {
 
             startConnection()
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "Exception initializing:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "Exception initializing:${e.message}")
         }
     }
 
@@ -102,14 +103,13 @@ class BillingUtils private constructor(private val builder: Builder) {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
 
                     if (billingResult.responseCode == BillingResponseCode.OK) {
-                        Logger.logDebug(LOG_TAG, "billing setup finished response okay")
+                        Logger.log(Level.DEBUG,Category.Billing, "billing setup finished response okay")
                         CoroutineScope(Dispatchers.IO).launch {
                             queryProductsAndSubDetails()
                             queryPurchasedAndSubs()
                         }
                     } else {
-                        Logger.logDebug(
-                            LOG_TAG,
+                        Logger.log(Level.DEBUG,Category.Billing,
                             "billing setup finished response:${billingResult.responseCode}" +
                                     " msg:${billingResult.debugMessage}"
                         )
@@ -117,17 +117,17 @@ class BillingUtils private constructor(private val builder: Builder) {
                 }
 
                 override fun onBillingServiceDisconnected() {
-                    Logger.logDebug(LOG_TAG, "billing service disconnected")
+                    Logger.log(Level.DEBUG,Category.Billing, "billing service disconnected")
                 }
             })
         } catch (ex: Exception) {
-            Logger.logError(LOG_TAG, "exception starting connection:${ex.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception starting connection:${ex.message}")
         }
     }
 
     fun oneTimePurchase(purchaseKey: String) {
         try {
-            Logger.logDebug(LOG_TAG, "one time purchase called")
+            Logger.log(Level.DEBUG,Category.Billing, "one time purchase called")
             billingClient?.queryProductDetailsAsync(
                 queryDetailParams(
                     ProductType.INAPP,
@@ -135,24 +135,23 @@ class BillingUtils private constructor(private val builder: Builder) {
                 )
             ) { result, products ->
                 if (result.responseCode == BillingResponseCode.OK && products.isNotEmpty()) {
-                    Logger.logDebug(LOG_TAG, "launching billing flow for one time purchase")
+                    Logger.log(Level.DEBUG,Category.Billing, "launching billing flow for one time purchase")
                     launchBillingFlow(products[0], false)
                 } else {
-                    Logger.logDebug(
-                        LOG_TAG,
+                    Logger.log(Level.DEBUG,Category.Billing,
                         "can't launch billing flow for purchase response:${result.responseCode} msg:${result.debugMessage}"
                     )
                 }
             }
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "exception performing one time purchase:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception performing one time purchase:${e.message}")
         }
     }
 
 
     fun subscribe(subKey: String) {
         try {
-            Logger.logDebug(LOG_TAG, "subscribe called")
+            Logger.log(Level.DEBUG,Category.Billing, "subscribe called")
 
             billingClient?.queryProductDetailsAsync(
                 queryDetailParams(
@@ -161,18 +160,17 @@ class BillingUtils private constructor(private val builder: Builder) {
                 )
             ) { result, products ->
                 if (result.responseCode == BillingResponseCode.OK && products.isNotEmpty()) {
-                    Logger.logDebug(LOG_TAG, "launching billing flow for subscription")
-                    Logger.logDebug(LOG_TAG, "sub products:$products")
+                    Logger.log(Level.DEBUG,Category.Billing, "launching billing flow for subscription")
+                    Logger.log(Level.DEBUG,Category.Billing, "sub products:$products")
                     launchBillingFlow(products[0], true)
                 } else {
-                    Logger.logDebug(
-                        LOG_TAG,
+                    Logger.log(Level.DEBUG,Category.Billing,
                         "can't launch billing flow for subscription response:${result.responseCode} msg:${result.debugMessage}"
                     )
                 }
             }
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "exception performing subscribe:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception performing subscribe:${e.message}")
         }
     }
 
@@ -205,14 +203,14 @@ class BillingUtils private constructor(private val builder: Builder) {
                 param
             ) { result: BillingResult, products: List<ProductDetails> ->
                 if (result.responseCode == BillingResponseCode.OK) {
-                    Logger.logDebug(LOG_TAG, "subscriptions:$products")
+                    Logger.log(Level.DEBUG,Category.Billing, "subscriptions:$products")
                     subscriptions.invoke(products)
                 } else {
                     subscriptions.invoke(emptyList())
                 }
             }
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "exception querying subscriptions details:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception querying subscriptions details:${e.message}")
             subscriptions.invoke(emptyList())
         }
     }
@@ -220,7 +218,7 @@ class BillingUtils private constructor(private val builder: Builder) {
 
     private fun queryProductsDetails(purchases: (List<ProductDetails>) -> Unit) {
         try {
-            Logger.logDebug(LOG_TAG, "querying products details")
+            Logger.log(Level.DEBUG,Category.Billing, "querying products details")
 
             val productList = ArrayList<QueryProductDetailsParams.Product>()
 
@@ -235,14 +233,14 @@ class BillingUtils private constructor(private val builder: Builder) {
                 param
             ) { result: BillingResult, products: List<ProductDetails> ->
                 if (result.responseCode == BillingResponseCode.OK) {
-                    Logger.logDebug(LOG_TAG, "products:$products")
+                    Logger.log(Level.DEBUG,Category.Billing, "products:$products")
                     purchases.invoke(products)
                 } else {
                     purchases.invoke(emptyList())
                 }
             }
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "exception querying products details:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception querying products details:${e.message}")
             purchases.invoke(emptyList())
         }
     }
@@ -268,15 +266,15 @@ class BillingUtils private constructor(private val builder: Builder) {
             billingClient?.queryPurchasesAsync(params) { billingResult, subscriptionsList ->
 
                 if (billingResult.responseCode == BillingResponseCode.OK) {
-                    Logger.logDebug(LOG_TAG, "subscribed products:$subscriptionsList")
+                    Logger.log(Level.DEBUG,Category.Billing, "subscribed products:$subscriptionsList")
                     subscriptions.invoke(subscriptionsList)
                 } else {
-                    Logger.logDebug(LOG_TAG, "query subscribed products response unknown:${billingResult.responseCode}")
+                    Logger.log(Level.DEBUG,Category.Billing, "query subscribed products response unknown:${billingResult.responseCode}")
                     subscriptions.invoke(subscriptionsList)
                 }
             }
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "exception querying subscribed products:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception querying subscribed products:${e.message}")
             subscriptions.invoke(emptyList())
         }
     }
@@ -290,15 +288,15 @@ class BillingUtils private constructor(private val builder: Builder) {
             billingClient?.queryPurchasesAsync(params) { billingResult, purchasesList ->
 
                 if (billingResult.responseCode == BillingResponseCode.OK) {
-                    Logger.logDebug(LOG_TAG, "purchased products:$purchasesList")
+                    Logger.log(Level.DEBUG,Category.Billing, "purchased products:$purchasesList")
                     purchases.invoke(purchasesList)
                 } else {
-                    Logger.logDebug(LOG_TAG, "query purchase products response unknown:${billingResult.responseCode}")
+                    Logger.log(Level.DEBUG,Category.Billing, "query purchase products response unknown:${billingResult.responseCode}")
                     purchases.invoke(purchasesList)
                 }
             }
         } catch (e:Exception){
-            Logger.logError(LOG_TAG, "exception querying purchased products:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception querying purchased products:${e.message}")
             purchases.invoke(emptyList())
         }
 
@@ -325,7 +323,7 @@ class BillingUtils private constructor(private val builder: Builder) {
         val params = ConsumeParams.newBuilder().setPurchaseToken(token).build()
         billingClient?.consumeAsync(params,object:ConsumeResponseListener{
             override fun onConsumeResponse(result: BillingResult, msg: String) {
-                Logger.logDebug(LOG_TAG,"consume response:${result.responseCode} msg:$msg")
+                Logger.log(Level.DEBUG,Category.Billing,"consume response:${result.responseCode} msg:$msg")
             }
         })
     }
@@ -355,7 +353,7 @@ class BillingUtils private constructor(private val builder: Builder) {
 
             billingClient?.launchBillingFlow(activity ?: return, billingFlowParams)
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "exception launching billing flow:${e.message}")
+            Logger.log(Level.ERROR,Category.Billing, "exception launching billing flow:${e.message}")
         }
     }
 

@@ -2,7 +2,6 @@ package com.sarmad.admobify.adsdk.app_open_ad
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -10,16 +9,16 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.appopen.AppOpenAd
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 import com.sarmad.admobify.adsdk.utils.isShowingInterAd
 import com.sarmad.admobify.adsdk.utils.isShowingOpenAd
 import com.sarmad.admobify.adsdk.utils.isShowingRewardAd
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
 import com.sarmad.admobify.adsdk.utils.setShowingOpenAd
 import java.util.Date
 
 object SplashOpenAppAd {
-
-    private const val LOG_TAG = "SplashOpenAppAd"
 
     private var splashOpenAd: AppOpenAd? = null
 
@@ -39,9 +38,22 @@ object SplashOpenAppAd {
 
         if (isSplashOpenAdLoading || isAdAvailable()) {
 
-            Log.d(LOG_TAG, "isSplashOpenAdLoading: $isSplashOpenAdLoading")
+            when {
 
-            Log.d(LOG_TAG, "is Ad Available: ${isAdAvailable()}")
+                isSplashOpenAdLoading -> {
+                    Logger.log(Level.DEBUG, Category.SplashOpenAd,
+                        "already loading an ad"
+                    )
+                }
+
+                isAdAvailable() -> {
+                    Logger.log(
+                        Level.DEBUG,
+                        Category.SplashOpenAd,
+                        "ad is already loaded"
+                    )
+                }
+            }
 
             return
         }
@@ -50,6 +62,8 @@ object SplashOpenAppAd {
         val networkAvailable = AdmobifyUtils.isNetworkAvailable(context)
 
         if (remote && !premiumUser && networkAvailable) {
+
+            Logger.log(Level.DEBUG, Category.SplashOpenAd, "requesting ad $adId")
 
             isSplashOpenAdLoading = true
 
@@ -72,7 +86,7 @@ object SplashOpenAppAd {
                 splashOpenAd = null
                 isSplashOpenAdLoading = false
 
-                Logger.logDebug(LOG_TAG, "onAdFailedToLoad")
+                 Logger.log(Level.ERROR, Category.SplashOpenAd, "onAdFailedToLoad error code:${error.code} error msg:${error.message}")
 
                 adFailed?.invoke(error)
             }
@@ -83,7 +97,7 @@ object SplashOpenAppAd {
                 splashOpenAd = ad
                 splashOpenAdLoadTime = Date().time
 
-                Logger.logDebug(LOG_TAG, "onAdLoaded")
+                 Logger.log(Level.DEBUG, Category.SplashOpenAd, "onAdLoaded")
 
                 adLoaded?.invoke()
 
@@ -98,7 +112,6 @@ object SplashOpenAppAd {
         adDismiss: () -> Unit
     ) {
         if (isAdAvailable() && canShowOpenAd()) {
-            Logger.logDebug(LOG_TAG, "showAppOpenAd -> called")
 
             splashOpenAd?.fullScreenContentCallback =
                 attachAdShowCallback(adShowFullScreen, adFailedToShow, adDismiss)
@@ -106,9 +119,15 @@ object SplashOpenAppAd {
             splashOpenAd?.show(activity)
         } else {
 
-            Logger.logDebug(LOG_TAG, "isAdAvailable:${isAdAvailable()}")
+            when {
+                !isAdAvailable() -> {
+                    Logger.log(Level.DEBUG, Category.SplashOpenAd, "ad not available")
+                }
 
-            Logger.logDebug(LOG_TAG, "any other ad is showing:${!canShowOpenAd()}")
+                !canShowOpenAd() -> {
+                    Logger.log(Level.DEBUG, Category.SplashOpenAd, "any other ad is showing")
+                }
+            }
 
             adFailedToShow.invoke(null)
         }
@@ -127,14 +146,17 @@ object SplashOpenAppAd {
 
                 setShowingOpenAd(false)
 
-                Logger.logDebug(LOG_TAG, "onAdDismissedFullScreenContent")
+                 Logger.log(Level.DEBUG, Category.SplashOpenAd, "ad dismiss full screen")
 
                 adDismiss.invoke()
             }
 
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
-
-                Logger.logDebug(LOG_TAG, "onAdFailedToShowFullScreenContent:${error.message}")
+                Logger.log(
+                    Level.ERROR,
+                    Category.SplashOpenAd,
+                    "ad failed to show error code:${error.code} error msg:${error.message}"
+                )
 
                 setShowingOpenAd(false)
 
@@ -144,7 +166,7 @@ object SplashOpenAppAd {
 
             override fun onAdShowedFullScreenContent() {
 
-                Logger.logDebug(LOG_TAG, "onAdShowedFullScreenContent")
+                 Logger.log(Level.DEBUG, Category.SplashOpenAd, "ad show full screen")
 
                 setShowingOpenAd(true)
 

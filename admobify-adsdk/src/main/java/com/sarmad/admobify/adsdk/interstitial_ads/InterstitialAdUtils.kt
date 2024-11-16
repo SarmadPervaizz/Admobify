@@ -5,7 +5,6 @@ import android.app.Application
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.ViewGroup
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -15,13 +14,13 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
 import com.sarmad.admobify.adsdk.utils.LoadingDialog
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 import com.sarmad.admobify.adsdk.utils.isShowingInterAd
 import com.sarmad.admobify.adsdk.utils.isShowingOpenAd
 import com.sarmad.admobify.adsdk.utils.isShowingRewardAd
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
 import com.sarmad.admobify.adsdk.utils.setShowingInterAd
-
-private const val LOG_TAG = "InterstitialAdUtils"
 
 class InterstitialAdUtils(builder: InterAdBuilder) {
 
@@ -35,7 +34,7 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
 
         /** To maintain state of loading ad to prevent sending multiple
          * load requests against single ad instance */
-        private var loadingAd = false
+        internal var loadingInterstitialAd = false
 
         /** As fake delay function is also available for simply showing
          * ad show we have to check whether show ad is called from Load and
@@ -77,7 +76,7 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
          */
 
         if (mInterstitialAd != null) {
-            Logger.logDebug(LOG_TAG, "adAlreadyLoaded")
+            Logger.log(Level.DEBUG,Category.Interstitial, "adAlreadyLoaded")
             loadCallback?.adAlreadyLoaded()
             return
         }
@@ -86,16 +85,16 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
          * An Ad request is already being processed
          */
 
-        if (loadingAd) {
+        if (loadingInterstitialAd) {
             val msg = "Already processing ad request"
-            Logger.logError(LOG_TAG, msg)
+            Logger.log(Level.DEBUG,Category.Interstitial, msg)
             loadCallback?.adFailed(null, msg)
             return
         }
 
         if (activity == null) {
             val msg = "Provided activity instance is null"
-            Logger.logError(LOG_TAG, msg)
+            Logger.log(Level.ERROR,Category.Interstitial, msg)
             loadCallback?.adFailed(null, msg)
             return
         }
@@ -105,7 +104,9 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
             AdmobifyUtils.isNetworkAvailable(activity)
         ) {
 
-            loadingAd = true
+            Logger.log(Level.DEBUG, Category.Interstitial, "requesting ad ${adOptions.getAdId()}")
+
+            loadingInterstitialAd = true
 
             InterstitialAd.load(activity?.applicationContext ?: return,
                 adOptions.getAdId(),
@@ -114,17 +115,17 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
 
                     override fun onAdFailedToLoad(error: LoadAdError) {
 
-                        Logger.logError(LOG_TAG, "onAdFailedToLoad:${error.message}")
+                        Logger.log(Level.ERROR,Category.Interstitial, "onAdFailedToLoad code:${error.code} msg:${error.message}")
 
-                        loadingAd = false
+                        loadingInterstitialAd = false
                         loadCallback?.adFailed(error, null)
                     }
 
                     override fun onAdLoaded(interAd: InterstitialAd) {
 
-                        Logger.logDebug(LOG_TAG, "onAdLoaded")
+                        Logger.log(Level.DEBUG,Category.Interstitial, "onAdLoaded")
 
-                        loadingAd = false
+                        loadingInterstitialAd = false
                         mInterstitialAd = interAd
                         loadCallback?.adLoaded()
                     }
@@ -132,7 +133,7 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
                 })
 
         } else {
-            Logger.logDebug(LOG_TAG, "adValidate")
+            Logger.log(Level.DEBUG,Category.Interstitial, "adValidate")
             loadCallback?.adValidate()
         }
     }
@@ -142,7 +143,7 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
         if (mInterstitialAd != null && adOptions.isRemoteEnabled() && !Admobify.isPremiumUser()) {
 
             if (isShowingInterAd() || isShowingRewardAd() || isShowingOpenAd()) {
-                Logger.logDebug(LOG_TAG, "Can't show ad An ad is already showing")
+                Logger.log(Level.DEBUG,Category.Interstitial, "Can't show ad An ad is already showing")
                 return
             }
 
@@ -174,7 +175,7 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
 
             fromLoadAndShow = false
         } else {
-            Logger.logDebug(LOG_TAG, "adNotAvailable")
+            Logger.log(Level.DEBUG,Category.Interstitial, "adNotAvailable")
             adShowCallback?.adNotAvailable()
         }
     }
@@ -196,10 +197,14 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
         val interShowCallback = object : FullScreenContentCallback() {
 
             override fun onAdClicked() {
+                Logger.log(Level.DEBUG,Category.Interstitial, "onAdClicked")
+
                 adShowCallback?.adClicked()
             }
 
             override fun onAdDismissedFullScreenContent() {
+                Logger.log(Level.DEBUG,Category.Interstitial, "onAdDismissedFullScreenContent")
+
                 mInterstitialAd = null
                 setShowingInterAd(false)
                 adShowCallback?.adDismiss()
@@ -209,16 +214,23 @@ class InterstitialAdUtils(builder: InterAdBuilder) {
             }
 
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                Logger.log(Level.ERROR,Category.Interstitial, "ad failed to show " +
+                        "error:${error.code} msg:${error.message}")
+
                 mInterstitialAd = null
                 setShowingInterAd(false)
                 adShowCallback?.adFailedToShow()
             }
 
             override fun onAdImpression() {
+                Logger.log(Level.DEBUG,Category.Interstitial, "onAdImpression")
+
                 adShowCallback?.adImpression()
             }
 
             override fun onAdShowedFullScreenContent() {
+                Logger.log(Level.DEBUG,Category.Interstitial, "onAdShowedFullScreenContent")
+
                 setShowingInterAd(true)
                 adShowCallback?.adShowFullScreen()
             }

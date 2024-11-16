@@ -3,14 +3,12 @@ package com.sarmad.admobify.adsdk.consent_form
 import android.app.Activity
 import com.google.android.ump.ConsentDebugSettings
 import com.google.android.ump.ConsentDebugSettings.DebugGeography
-import com.google.android.ump.ConsentForm
 import com.google.android.ump.ConsentInformation
-import com.google.android.ump.ConsentInformation.OnConsentInfoUpdateFailureListener
-import com.google.android.ump.ConsentInformation.OnConsentInfoUpdateSuccessListener
 import com.google.android.ump.ConsentRequestParameters
-import com.google.android.ump.FormError
 import com.google.android.ump.UserMessagingPlatform
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 
 private const val TAG = "AdmobConsentForm"
 
@@ -55,7 +53,7 @@ class AdmobConsentForm private constructor(
 
             /** Consent Info Update Success */
             {
-                Logger.logInfo(TAG, "Consent Info update success")
+                Logger.log(Level.INFO, Category.ConsentForm, "Consent Info update success")
 
                 UserMessagingPlatform.loadAndShowConsentFormIfRequired(
                     activity
@@ -67,9 +65,9 @@ class AdmobConsentForm private constructor(
                         val msg =
                             "Consent form dismiss error:${error.errorCode} msg:${error.message}"
 
-                        Logger.logError(TAG, msg)
+                        Logger.log(Level.DEBUG, Category.ConsentForm, msg)
                     } else {
-                        Logger.logInfo(TAG, "User consent received")
+                        Logger.log(Level.INFO, Category.ConsentForm, "User consent received")
                     }
 
                     onFormDismiss.invoke()
@@ -78,8 +76,7 @@ class AdmobConsentForm private constructor(
 
         /** Consent Info Update Failure */
         { error ->
-            Logger.logError(
-                TAG,
+            Logger.log(Level.ERROR, Category.ConsentForm,
                 "Consent info update failure error:${error.errorCode} msg:${error.message}"
             )
 

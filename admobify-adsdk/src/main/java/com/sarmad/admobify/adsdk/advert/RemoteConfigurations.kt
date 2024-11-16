@@ -5,10 +5,10 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.get
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.sarmad.admobify.adsdk.BuildConfig
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
 
 object RemoteConfigurations {
-
 
     fun fetchRemotes(
         activity: Activity,
@@ -23,7 +23,7 @@ object RemoteConfigurations {
 
         val remoteConfig = FirebaseRemoteConfig.getInstance()
         val configSettings = remoteConfigSettings {
-            minimumFetchIntervalInSeconds = if (AdmobifyUtils.isDebug()) 60 else fetchInterval
+            minimumFetchIntervalInSeconds = if (BuildConfig.DEBUG) 60 else fetchInterval
         }
 
         remoteConfig.setConfigSettingsAsync(configSettings)

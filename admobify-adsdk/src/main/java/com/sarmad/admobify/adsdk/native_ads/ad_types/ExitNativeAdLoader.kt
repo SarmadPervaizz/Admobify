@@ -11,11 +11,11 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.sarmad.admobify.adsdk.native_ads.NativeAdCallback
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 
 internal object ExitNativeAdLoader {
-
-    const val TAG = "ExitNativeAdLoader"
 
     private var nativeAdCallback: NativeAdCallback? = null
 
@@ -41,12 +41,12 @@ internal object ExitNativeAdLoader {
 
                 nativeAdCallback?.adLoaded(nativeAd)
 
-                Logger.logDebug(TAG, "loadNativeAd:adAlreadyPreCached")
+                Logger.log(Level.DEBUG, Category.Native, "exit ad already pre cached ")
 
             } else {
 
                 if (loadingNativeAd) {
-                    Logger.logDebug(TAG, "loadNativeAd:Already loading ad")
+                    Logger.log(Level.DEBUG, Category.Native, "exit ad is already loading")
                     return
                 }
 
@@ -67,8 +67,8 @@ internal object ExitNativeAdLoader {
             }
         } else {
 
-            Logger.logDebug(IntroNativeAdLoader.TAG,
-                "adValidate: remote:$remote network:$network " +
+            Logger.log(Level.DEBUG,Category.Native,
+                "exit ad validate: remote:$remote network:$network " +
                         "premium user:${Admobify.isPremiumUser()}"
             )
 
@@ -81,25 +81,31 @@ internal object ExitNativeAdLoader {
 
             override fun onAdClicked() {
                 nativeAdCallback?.adClicked()
-                Logger.logDebug(TAG, "loadNativeAd:onAdClicked")
+
+                Logger.log(Level.DEBUG, Category.Native, "exit ad clicked")
             }
 
             override fun onAdFailedToLoad(error: LoadAdError) {
                 loadingNativeAd = false
                 nativeAdCallback?.adFailed(error)
-                Logger.logDebug(TAG, "loadNativeAd:onAdFailedToLoad:${error.message}")
+
+                Logger.log(Level.ERROR, Category.Native, "exit ad failed to load " +
+                        "code:${error.code} msg:${error.message}")
+
             }
 
             override fun onAdImpression() {
                 nativeAd = null
                 nativeAdCallback?.adImpression()
-                Logger.logDebug(TAG, "loadNativeAd:onAdImpression")
+                Logger.log(Level.DEBUG, Category.Native, "exit ad impression")
+
             }
 
             override fun onAdLoaded() {
                 loadingNativeAd = false
                 nativeAdCallback?.adLoaded(nativeAd)
-                Logger.logDebug(TAG, "loadNativeAd:onAdLoaded")
+                Logger.log(Level.DEBUG, Category.Native, "exit ad loaded")
+
             }
 
         }

@@ -11,11 +11,11 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.sarmad.admobify.adsdk.native_ads.NativeAdCallback
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 
 internal object IntroNativeAdLoader {
-
-    const val TAG = "IntroNativeAdLoader"
 
     private var nativeAdCallback: NativeAdCallback? = null
 
@@ -41,12 +41,12 @@ internal object IntroNativeAdLoader {
 
                 nativeAdCallback?.adLoaded(nativeAd)
 
-                Logger.logDebug(TAG, "loadNativeAd:adAlreadyPreCached intro ad")
+                Logger.log(Level.DEBUG,Category.Native, "intro ad already pre cached")
 
             } else {
 
                 if (loadingNativeAd) {
-                    Logger.logDebug(TAG, "loadNativeAd:Already loading intro ad")
+                    Logger.log(Level.DEBUG,Category.Native,  "intro ad already loading")
                     return
                 }
 
@@ -69,7 +69,7 @@ internal object IntroNativeAdLoader {
 
         } else {
 
-            Logger.logDebug(TAG,
+            Logger.log(Level.DEBUG,Category.Native,
                 "adValidate: remote:$remote network:$network" +
                         " premium user:${Admobify.isPremiumUser()}"
             )
@@ -78,30 +78,36 @@ internal object IntroNativeAdLoader {
         }
     }
 
+
     private fun attachAdListener(): AdListener {
         val listener = object : AdListener() {
 
             override fun onAdClicked() {
                 nativeAdCallback?.adClicked()
-                Logger.logDebug(TAG, "loadNativeAd:onAdClicked")
+                Logger.log(Level.DEBUG,Category.Native, "intro ad clicked")
             }
 
             override fun onAdFailedToLoad(error: LoadAdError) {
                 loadingNativeAd = false
                 nativeAdCallback?.adFailed(error)
-                Logger.logDebug(TAG, "loadNativeAd:onAdFailedToLoad:${error.message}")
+                Logger.log(Level.ERROR, Category.Native, "intro ad failed to load " +
+                        "code:${error.code} msg:${error.message}")
             }
 
             override fun onAdImpression() {
                 nativeAd = null
                 nativeAdCallback?.adImpression()
-                Logger.logDebug(TAG, "loadNativeAd:onAdImpression")
+
+                Logger.log(Level.DEBUG, Category.Native, "intro ad impression")
+
             }
 
             override fun onAdLoaded() {
                 loadingNativeAd = false
                 nativeAdCallback?.adLoaded(nativeAd)
-                Logger.logDebug(TAG, "loadNativeAd:onAdLoaded")
+
+                Logger.log(Level.DEBUG, Category.Native, "intro ad loaded")
+
             }
 
         }

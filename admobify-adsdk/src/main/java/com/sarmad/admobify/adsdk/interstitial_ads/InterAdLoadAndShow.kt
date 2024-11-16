@@ -6,12 +6,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import com.google.android.gms.ads.LoadAdError
+import com.sarmad.admobify.adsdk.interstitial_ads.InterstitialAdUtils.Companion.loadingInterstitialAd
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
 import com.sarmad.admobify.adsdk.utils.LoadingDialog
 import com.sarmad.admobify.adsdk.utils.isShowingInterAd
 import com.sarmad.admobify.adsdk.utils.isShowingOpenAd
 import com.sarmad.admobify.adsdk.utils.isShowingRewardAd
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 
 internal class InterAdLoadAndShow(
     val activity: Activity,
@@ -77,6 +81,17 @@ internal class InterAdLoadAndShow(
         showCallback: InterAdShowCallback?,
         readyToNavigate: (() -> Unit)? = null
     ) {
+
+        /**
+         * An Ad request is already being processed
+         */
+
+        if (loadingInterstitialAd) {
+            val msg = "Already processing ad request"
+            Logger.log(Level.DEBUG, Category.Interstitial, msg)
+            loadCallback?.adFailed(null, msg)
+            return
+        }
 
         /** Check required params before showing loading dialog */
 

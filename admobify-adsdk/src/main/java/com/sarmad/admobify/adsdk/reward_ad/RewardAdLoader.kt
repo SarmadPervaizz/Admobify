@@ -9,14 +9,15 @@ import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.sarmad.admobify.adsdk.utils.Admobify
 import com.sarmad.admobify.adsdk.utils.AdmobifyUtils
-import com.sarmad.admobify.adsdk.utils.Logger
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 import com.sarmad.admobify.adsdk.utils.isShowingInterAd
 import com.sarmad.admobify.adsdk.utils.isShowingOpenAd
 import com.sarmad.admobify.adsdk.utils.isShowingRewardAd
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
 import com.sarmad.admobify.adsdk.utils.setShowingRewardAd
 
 internal object RewardAdLoader {
-    private const val TAG = "RewardAdLoader"
 
     fun loadRewardAd(
         context: Activity,
@@ -31,10 +32,8 @@ internal object RewardAdLoader {
 
 
             if (RewardedAdUtils.getRewardAd() != null) {
-
                 callback.adAlreadyLoaded()
-                Logger.logDebug(TAG, "adAlreadyLoaded")
-
+                Logger.log(Level.DEBUG, Category.Rewarded, "ad already loaded")
                 return
             }
 
@@ -46,8 +45,7 @@ internal object RewardAdLoader {
 
             logValidateError(
                 networkAvailable = networkAvailable,
-                remote = remote,
-                context = context
+                remote = remote
             )
         }
 
@@ -58,14 +56,18 @@ internal object RewardAdLoader {
 
             override fun onAdFailedToLoad(error: LoadAdError) {
 
-                Logger.logDebug(TAG, "onAdFailedToLoad:${error.message}")
+                Logger.log(
+                    Level.ERROR,
+                    Category.Rewarded,
+                    "ad failed to load error:${error.code} msg:${error.message}"
+                )
 
                 RewardedAdUtils.setRewardAd(null)
                 callback.adFailed(error, null)
             }
 
             override fun onAdLoaded(reward: RewardedAd) {
-                Logger.logDebug(TAG, "onAdLoaded")
+                Logger.log(Level.DEBUG, Category.Rewarded, "onAdLoaded")
 
                 RewardedAdUtils.setRewardAd(reward)
 
@@ -84,12 +86,12 @@ internal object RewardAdLoader {
 
             if (RewardedAdUtils.getRewardAd() == null) {
                 callback.adNotAvailable()
-                Logger.logDebug(TAG,"adNotAvailable")
+                Logger.log(Level.DEBUG, Category.Rewarded,"adNotAvailable")
                 return
             }
 
             if (isShowingRewardAd() || isShowingInterAd() || isShowingOpenAd()){
-                Logger.logDebug(TAG,"Can't show ad An ad is already showing")
+                Logger.log(Level.DEBUG, Category.Rewarded,"Can't show ad An ad is already showing")
                 return
             }
 
@@ -105,7 +107,7 @@ internal object RewardAdLoader {
 
             callback.adValidate()
 
-            logValidateError("show", networkAvailable, remote, context)
+            logValidateError("show", networkAvailable, remote)
         }
     }
 
@@ -113,10 +115,14 @@ internal object RewardAdLoader {
 
         val listener = object : FullScreenContentCallback() {
             override fun onAdClicked() {
+                Logger.log(Level.DEBUG, Category.Rewarded,"onAdClicked")
+
                 callback.adClicked()
             }
 
             override fun onAdDismissedFullScreenContent() {
+                Logger.log(Level.DEBUG, Category.Rewarded,"ad dismiss")
+
                 callback.adDismiss()
 
                 RewardedAdUtils.setRewardAd(null)
@@ -124,15 +130,27 @@ internal object RewardAdLoader {
             }
 
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
+
+                Logger.log(
+                    Level.ERROR,
+                    Category.Rewarded,
+                    "ad failed to show error:${error.code} msg:${error.message}"
+                )
+
                 callback.adFailedToShow(error)
+
                 setShowingRewardAd(false)
             }
 
             override fun onAdImpression() {
+                Logger.log(Level.DEBUG, Category.Rewarded,"ad impression")
+
                 callback.adImpression()
             }
 
             override fun onAdShowedFullScreenContent() {
+                Logger.log(Level.DEBUG, Category.Rewarded,"ad show full screen")
+
                 callback.adShowFullScreen()
                 setShowingRewardAd(true)
             }
@@ -145,18 +163,14 @@ internal object RewardAdLoader {
     private fun logValidateError(
         showOrLoad: String = "load",
         networkAvailable: Boolean,
-        remote: Boolean,
-        context: Activity
+        remote: Boolean
     ) {
 
         val msg = "can't $showOrLoad ad internet available:$networkAvailable " +
                 "remote:$remote premium user:${Admobify.isPremiumUser()}"
 
-        Logger.logError(TAG, msg)
+        Logger.log(Level.ERROR, Category.Rewarded, msg)
 
-        if (AdmobifyUtils.isDebug()) {
-            AdmobifyUtils.showSnackBar(context, msg)
-        }
     }
 
 

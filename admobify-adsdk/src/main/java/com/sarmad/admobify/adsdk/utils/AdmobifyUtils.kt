@@ -12,16 +12,15 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.AdSize
-import com.google.android.material.snackbar.Snackbar
+import com.sarmad.admobify.adsdk.BuildConfig
+import com.sarmad.admobify.adsdk.utils.logger.Category
+import com.sarmad.admobify.adsdk.utils.logger.Level
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Date
-import kotlin.math.max
 
 object AdmobifyUtils {
-
-    private const val LOG_TAG = "AdmobifyUtils"
 
     private var appLifecycleScope = ProcessLifecycleOwner.get().lifecycleScope
 
@@ -35,27 +34,16 @@ object AdmobifyUtils {
         "ca-app-pub-3940256099942544/5224354917"
     )
 
-    fun showSnackBar(context: Activity, msg: String) {
+    /*internal fun showSnackBar(context: Activity, msg: String) {
         val rootView: View? = context.findViewById(android.R.id.content)
         Snackbar.make(rootView ?: return, msg, Snackbar.LENGTH_SHORT).show()
     }
+*/
 
-    fun isDebug(): Boolean {
+    private fun isDebug() = BuildConfig.DEBUG
 
-        val buildFlavor = Admobify.mBuildFlavor
 
-        val buildVariant = Admobify.mBuildVariant
-
-        val devDebug = buildFlavor == "appDev" && buildVariant == "debug"
-
-        val devRelease = buildFlavor == "appDev" && buildVariant == "release"
-
-        val prodDebug = buildFlavor == "appProd" && buildVariant == "debug"
-
-        return devDebug || devRelease || prodDebug
-    }
-
-    fun wasLoadTimeLessThanNHoursAgo(numHours: Long, loadTime: Long): Boolean {
+    internal fun wasLoadTimeLessThanNHoursAgo(numHours: Long, loadTime: Long): Boolean {
         val dateDifference = Date().time - loadTime
         val numMilliSecondsPerHour = 3600000
         return dateDifference < numMilliSecondsPerHour * numHours
@@ -65,6 +53,7 @@ object AdmobifyUtils {
     internal fun View.hide() {
         visibility = View.GONE
     }
+
 
     internal fun View.show() {
         visibility = View.VISIBLE
@@ -80,6 +69,7 @@ object AdmobifyUtils {
             networkAvailableBelow6(context)
         }
     }
+
 
     private fun networkAvailableBelow6(context: Context): Boolean {
         val connectivityManager =
@@ -186,17 +176,13 @@ object AdmobifyUtils {
 
 
     private fun throwExceptionOrLogError(msg: String) {
-
-        val adValidation = "AD_VALIDATION"
-
         if (Admobify.canThrowException()) {
             throw InvalidAdIDException(msg)
         } else {
-            Logger.logError(adValidation, msg)
+            Logger.log(Level.ERROR,Category.AdValidation,msg)
         }
     }
 
-    //TODO: just use all ads for once then push to github
 
     fun getAdSize(activity: Activity, container: ViewGroup?): AdSize? {
         try {
@@ -215,7 +201,7 @@ object AdmobifyUtils {
             val adWidth = (adWidthPixels / density).toInt()
             return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, adWidth)
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "error getting banner adsize:${e.message}")
+            Logger.log(Level.ERROR,Category.Banner, "error getting banner adsize:${e.message}")
         }
         return null
     }
@@ -238,7 +224,7 @@ object AdmobifyUtils {
             val adWidth = (adWidthPixels / density).toInt()
             return AdSize.getInlineAdaptiveBannerAdSize(adWidth, maxHeight)
         } catch (e: Exception) {
-            Logger.logError(LOG_TAG, "error getting adaptive adsize:${e.message}")
+            Logger.log(Level.ERROR,Category.Banner,  "error getting adaptive adsize:${e.message}")
         }
         return null
     }

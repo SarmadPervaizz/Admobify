@@ -17,16 +17,15 @@
             android:name=".RewardedAdActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".NativeAdsActivity"
+            android:exported="false" />
 
-         <activity
+        <activity
             android:name=".SplashOpenAdActivity"
             android:exported="false" />
 
         <activity
-            android:name=".InterstitialAdsActivity"
-            android:exported="false" />
-
-             <activity
             android:name=".DefaultBannerAdNestedActivity"
             android:exported="false" />
 
@@ -36,7 +35,7 @@
 
 
         <activity
-            android:name=".NativeAdsActivity"
+            android:name=".InterstitialAdsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

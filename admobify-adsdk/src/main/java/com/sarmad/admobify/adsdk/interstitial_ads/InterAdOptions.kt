@@ -29,7 +29,7 @@ open class InterAdOptions {
 
     /** To Show Loading Dialog with fake delay for 1 or 2 seconds */
 
-    fun setFakeDelayForDialog(seconds:Int):InterAdOptions{
+    fun setLoadingDelayForDialog(seconds:Int):InterAdOptions{
         dialogFakeDelay = seconds * 1000L
         return this
     }

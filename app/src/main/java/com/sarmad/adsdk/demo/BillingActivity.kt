@@ -1,10 +1,7 @@
 package com.sarmad.adsdk.demo
 
-import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
@@ -19,38 +16,35 @@ class BillingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_billing)
+        val btnPurchase = findViewById<Button>(R.id.btnPurchase)
+
+        val btnSubscribe = findViewById<Button>(R.id.btnSubscribe)
+
+
         billingUtils = BillingUtils.getInstance().setPurchaseIds(purchaseKey).
         setSubscriptionIds(subKey).setBillingListener(object : BillingListener() {
 
-            override fun productAndSubMetaData(
-                purchaseList: List<ProductDetails>,
-                subList: List<ProductDetails>
-            ) {
-
-            }
-
+            /** Products user currently subscribed or purchased **/
             override fun purchasedAndSubscribedList(
                 purchaseList: List<Purchase>,
-                subList: List<Purchase>
-            ) {
+                subList: List<Purchase>) {}
 
-            }
+            /** Products and Subscriptions meta data like price, duration etc */
+            override fun productAndSubMetaData(
+                products: List<ProductDetails>,
+                subscriptions: List<ProductDetails>) {}
 
-            override fun purchasedORSubDone(productsList: List<Purchase?>) {
-                Toast.makeText(this@BillingActivity, "purchasedORSubDone", Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this@BillingActivity,BannerAdsActivity::class.java))
-                }
-            }).build(this)
+            /** this callback invoked when purchase or subscription
+             * transaction successful on runtime */
+            override fun purchasedORSubDone(productsList: List<Purchase?>) {}
 
-        val purchase = findViewById<Button>(R.id.btnPurchase)
+        }).build(this)
 
-        val subscription = findViewById<Button>(R.id.btnSubscribe)
-
-        purchase.setOnClickListener {
+        btnPurchase.setOnClickListener {
             billingUtils?.oneTimePurchase(purchaseKey)
         }
 
-        subscription.setOnClickListener {
+        btnSubscribe.setOnClickListener {
             billingUtils?.subscribe(subKey)
         }
 
