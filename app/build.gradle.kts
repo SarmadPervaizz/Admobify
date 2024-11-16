@@ -80,7 +80,7 @@ dependencies {
     implementation(libs.google.ads)
     implementation(project(":admobify-adsdk"))
 
-//    implementation("com.github.SarmadPervaizz:Admobify:1.5")
+//    implementation("com.github.SarmadPervaizz:Admobify:1.6")
 
     implementation (libs.sdp.android)
     implementation (libs.ssp.android)

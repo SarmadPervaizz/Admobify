@@ -6,12 +6,6 @@ plugins {
 
 android {
 
-  /*  publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }*/
-
     namespace = "com.sarmad.admobify.adsdk"
     compileSdk = 34
 
@@ -76,21 +70,9 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.SarmadPervaizz"
                 artifactId = "admobify"
-                version = "1.5"
+                version = "1.6"
             }
         }
     }
 }
 
-/*val sourcesJar by tasks.registering(Jar::class) {
-    archiveClassifier.set("sources")
-
-
-    from(files(android.sourceSets["main"].java.srcDirs))
-    from(files(android.sourceSets["main"].kotlin.srcDirs()))
-
-}
-
-tasks.named("sourcesJar").configure {
-    dependsOn(tasks.named("compileReleaseKotlin"))
-}*/
