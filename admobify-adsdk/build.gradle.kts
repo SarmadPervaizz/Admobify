@@ -70,7 +70,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.SarmadPervaizz"
                 artifactId = "admobify"
-                version = "1.8-beta1"
+                version = "1.8"
             }
         }
     }
