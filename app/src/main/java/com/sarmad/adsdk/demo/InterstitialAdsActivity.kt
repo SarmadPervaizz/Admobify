@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.sarmad.admobify.adsdk.interstitial_ads.InterAdBuilder
 import com.sarmad.admobify.adsdk.interstitial_ads.InterAdOptions
 import com.sarmad.admobify.adsdk.interstitial_ads.InterstitialAdUtils
+import com.sarmad.admobify.adsdk.utils.logger.Logger
 import com.sarmad.adsdk.demo.databinding.ActivityInterstitialAdsBinding
 
 class InterstitialAdsActivity : AppCompatActivity() {
@@ -24,6 +25,7 @@ class InterstitialAdsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        Logger.enableLogging()
         binding.apply {
             btnLoadShow.setOnClickListener {
                 InterstitialAdUtils(adBuilder).loadAndShowInterAd(null, null)

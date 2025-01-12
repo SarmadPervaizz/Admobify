@@ -10,8 +10,10 @@ object Logger {
 
     private const val LOG_TAG = "Ads_"
 
+    /** In Release variant logging is disabled by default */
     private var loggingEnabled = false
 
+    /** Enable logging in Release variant */
     fun enableLogging(){
         loggingEnabled = true
     }
