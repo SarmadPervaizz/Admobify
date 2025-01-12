@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal object Logger {
+object Logger {
 
     private const val LOG_TAG = "Ads_"
 
@@ -27,23 +27,23 @@ internal object Logger {
             val tag = LOG_TAG + category.name
             when (level) {
                 Level.VERBOSE -> {
-                    Log.v(tag, msg, exception)
+                    exception?.let { Log.v(tag, msg, exception) } ?: Log.v(tag, msg)
                 }
 
                 Level.DEBUG -> {
-                    Log.d(tag, msg, exception)
+                    exception?.let { Log.d(tag, msg, exception) } ?: Log.d(tag, msg)
                 }
 
                 Level.INFO -> {
-                    Log.i(tag, msg, exception)
+                    exception?.let { Log.i(tag, msg, exception) } ?: Log.i(tag, msg)
                 }
 
                 Level.WARN -> {
-                    Log.w(tag, msg, exception)
+                    exception?.let { Log.w(tag, msg, exception) } ?: Log.w(tag, msg)
                 }
 
                 Level.ERROR -> {
-                    Log.e(tag, msg, exception)
+                    exception?.let { Log.e(tag, msg, exception) } ?: Log.e(tag, msg)
                 }
             }
 
